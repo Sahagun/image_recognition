@@ -8,6 +8,7 @@ import 'package:tflite/tflite.dart';
 
 import 'bounding_box_widget.dart';
 import 'camera_widget.dart';
+import 'detecting_camera_widget.dart';
 
 class LiveFeed extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -28,6 +29,7 @@ class _LiveFeedState extends State<LiveFeed> {
   CameraValue _cameraValue;
   CameraFeed cameraFeed;
 
+  CameraController _controller;
 
   initCameras() async {
 
@@ -52,15 +54,17 @@ class _LiveFeedState extends State<LiveFeed> {
     });
   }
 
-  setCameraValue(cameraValue){
+  setCameraValue(cameraValue, controller){
     setState(() {
       _cameraValue = cameraValue;
+      _controller = controller;
     });
   }
 
   _nothing(){
     setState(() {
       isLive = !isLive;
+      _controller.takePicture();
     });
   }
 
@@ -83,37 +87,45 @@ class _LiveFeedState extends State<LiveFeed> {
       appBar: AppBar(
         title: Text("Real Time Object Detection"),
       ),
-      body: Stack(
-        children: <Widget>[
+      body:
 
-          cameraFeed,
-          BoundingBox(
-            _recognitions == null ? [] : _recognitions,
-            math.max(_imageHeight, _imageWidth),
-            math.min(_imageHeight, _imageWidth),
-            screen.height,
-            screen.width,
-          ),
+      Container(
+        child: CameraDetectingFeed(widget.cameras, screen, setRecognitions, setCameraValue)
+      )
 
 
-          // Center(
-          //   child: Align(
-          //     alignment: FractionalOffset.bottomCenter,
-          //     child:
-          //     _cameraValue == null ?
-          //     ElevatedButton(
-          //         onPressed: null,
-          //         child: Text('Pause'))
-          //       :
-          //         ElevatedButton(
-          //             // onPressed: _cameraValue.isTakingPicture?null:_nothing,
-          //             onPressed: _nothing,
-          //             child: Text(_cameraValue.isStreamingImages?'Pause':'Resume'))
-          //   )
-          // )
+      // Stack(
+      //   children: <Widget>[
+      //     cameraFeed,
+      //     BoundingBox(
+      //       _recognitions == null ? [] : _recognitions,
+      //       math.max(_imageHeight, _imageWidth),
+      //       math.min(_imageHeight, _imageWidth),
+      //       screen.height,
+      //       screen.width,
+      //     ),
+      //     Center(
+      //       child: Align(
+      //         alignment: FractionalOffset.bottomCenter,
+      //         child:
+      //         _cameraValue == null ?
+      //         ElevatedButton(
+      //             onPressed: null,
+      //             child: Text('Pause'))
+      //           :
+      //             ElevatedButton(
+      //                 // onPressed: _cameraValue.isTakingPicture?null:_nothing,
+      //                 onPressed: _nothing,
+      //                 child: Text(_cameraValue.isStreamingImages?'Pause':'Resume'))
+      //       )
+      //     )
+      //   ],
+      // ),
 
-        ],
-      ),
+
+
+
+
     );
   }
 }

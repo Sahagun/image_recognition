@@ -14,6 +14,8 @@ class CameraFeed extends StatefulWidget {
   final Callback setRecognitions;
   final setValues;
 
+
+
   bool isLive = true;
   bool isTakingPicture = false;
 
@@ -88,7 +90,7 @@ class _CameraFeedState extends State<CameraFeed> {
     if (controller.value.isStreamingImages){return;}
 
     controller.startImageStream((CameraImage img) {
-      if(widget.isLive){
+      if(!controller.value.isTakingPicture){
         still = img;
 
         if (!isDetecting) {
@@ -109,7 +111,7 @@ class _CameraFeedState extends State<CameraFeed> {
                  */
             widget.setRecognitions(recognitions, img.height, img.width);
 
-            widget.setValues(controller.value);
+            widget.setValues(controller.value, controller);
 
             isDetecting = false;
           });
@@ -136,7 +138,7 @@ class _CameraFeedState extends State<CameraFeed> {
           return;
         }
 
-        widget.setValues(controller.value);
+        widget.setValues(controller.value, controller);
 
         setState(() {});
 
@@ -177,7 +179,7 @@ class _CameraFeedState extends State<CameraFeed> {
 
 
 
-    if(widget.isLive) {
+    if(controller.value.isStreamingImages) {
       // if(widget.isLive && !controller.value.isTakingPicture) {
       startStream();
       return OverflowBox(
@@ -225,8 +227,21 @@ class _CameraFeedState extends State<CameraFeed> {
                       // return Text(snapshot.data as String);
                     }
                   }
+
                   return Center(
                     child: CircularProgressIndicator(),
+                    // child: Text(ctx.toString()),
+
+
+                  // child: Column(
+                  //     children: <Widget>[
+                  //       Text(TimeOfDay.now().toString()),
+                  //       CircularProgressIndicator(),
+                  //     ],
+                  //   )
+
+
+
                   );
                 }
             )
